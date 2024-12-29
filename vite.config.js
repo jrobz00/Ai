@@ -4,7 +4,10 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 import viteConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  build: { reportCompressedSize: false },
+  build: {
+    reportCompressedSize: false,
+    outDir: 'build',  // Set the output directory to 'build'
+  },
   plugins: [
     viteConfigPaths(),
     viteReactPlugin(),

@@ -54,32 +54,10 @@ const ChatPage = () => {
   // Handle sending messages and interacting with AI
   const handleSend = async () => {
     if (input.trim() !== "") {
-      // Check if the input contains keywords related to website creation
-      if (
-        input.toLowerCase().includes("website") ||
-        input.toLowerCase().includes("navbar") ||
-        input.toLowerCase().includes("make a site")
-      ) {
-        const disabledMessage = {
-          sender: "bot",
-          text: "Website creation and similar requests are temporarily disabled. Please try again later.",
-        };
-        setMessages([...messages, disabledMessage]);
-        setInput(""); // Reset input field
-        return; // Prevent further processing
-      }
-
       const newMessage = { sender: "user", text: input };
       const updatedMessages = [...messages, newMessage];
       setMessages(updatedMessages);
       setInput("");
-
-      if (activeChat) {
-        setActiveChat((prev) => ({
-          ...prev,
-          history: [...prev.history, newMessage],
-        }));
-      }
 
       // Send the user's message to OpenAI API
       try {
@@ -102,7 +80,10 @@ const ChatPage = () => {
           text: response.data.choices[0].message.content,
         };
 
-        setMessages((prevMessages) => [...prevMessages, botResponse]);
+        setMessages((prevMessages) => [
+          ...prevMessages.filter((msg) => msg.sender !== "bot"), // Clear previous bot responses
+          botResponse,
+        ]);
 
         if (activeChat) {
           setActiveChat((prev) => ({
@@ -129,30 +110,9 @@ const ChatPage = () => {
       <Navbar />
 
       <div className="flex justify-center items-center mt-16">
-        <div className="w-[85%] h-[80vh] grid grid-cols-3 gap-8 p-6 bg-white shadow-lg rounded-lg">
-          {/* Sidebar for Previous Chats */}
-          <aside className="col-span-1 bg-gray-100 shadow-md rounded-lg flex flex-col">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-bold flex items-center space-x-2 text-gray-800">
-                <MdOutlineChatBubbleOutline size={24} />
-                <span>Chats</span>
-              </h2>
-            </div>
-            <ul className="flex-grow overflow-y-auto p-4 space-y-3">
-              {messages.length > 0 ? (
-                messages.map((message, index) => (
-                  <li key={index} className="flex items-center space-x-2 p-3 rounded-lg">
-                    <span>{message.text}</span>
-                  </li>
-                ))
-              ) : (
-                <p className="text-gray-500">No messages yet.</p>
-              )}
-            </ul>
-          </aside>
-
+        <div className="w-[85%] max-w-[1200px] h-[80vh] grid grid-cols-1 gap-8 p-6 bg-white shadow-lg rounded-lg">
           {/* Main Chat Area */}
-          <div className="col-span-2 bg-white shadow-md rounded-lg flex flex-col">
+          <div className="col-span-1 bg-white shadow-md rounded-lg flex flex-col">
             {/* Header */}
             <header className="bg-gray-100 py-4 px-6 flex justify-between items-center rounded-t-lg">
               <h1 className="text-xl font-bold text-gray-800">AI Chat</h1>
